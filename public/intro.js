@@ -3,9 +3,9 @@ let now = 0;
 
 function preload() {
     introImgs[0] = loadImage('./images/intro/notebook.png');
-    introImgs[1] = loadImage('./images/intro/Inkednotebook_LI.jpg');
-    introImgs[2] = loadImage('./images/intro/Inkednotebook_LI3.jpg');
-    introImgs[3] = loadImage('./images/intro/Inkednotebook_LI4.jpg');
+    introImgs[1] = loadImage('./images/intro/story.png');
+    introImgs[2] = loadImage('./images/intro/story.png');
+    introImgs[3] = loadImage('./images/intro/story.png');
 }
 
 function setup() {
@@ -56,5 +56,9 @@ function draw() {
 
     /* 顯示當前頁面 */
     background(introImgs[now]);
+
+    textSize(140);
+    textAlign(CENTER, CENTER);
+    text(`${now+1}`, 500, 300);
 }
 
