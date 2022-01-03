@@ -1,8 +1,9 @@
 // 變數 ===========================================
 /* 固定變數 */
 let result_background_img;
-let background_img;
-let palne;
+let background_img_path = './images/background.jpg';
+let palne_path = './images/plane_fly.png';
+let people_path = './images/animal/chick.png'
 
 /* 動態變數 */
 // 角色
@@ -49,9 +50,9 @@ function touch_detection(i) {
 // ===============================================
 
 function preload() {
-    result_background_img = loadImage('./images/annai_monitor_businessman.png');
-    background_img = loadImage('./images/background.jpg');
-    plane = loadImage('./images/plane_fly.png')
+    // result_background_img = loadImage('./images/annai_monitor_businessman.png');
+    background_img = loadImage(background_img_path);
+    plane = loadImage(palne_path)
 
     for(let i = 0 ; i < sprite_list.length ; i++){
         let way = i % 6;
@@ -76,7 +77,7 @@ function preload() {
                 break 
             }
         sprite_list[i] = createSprite(Math.random()*1000%1000+50 ,yLabel);
-        sprite_list[i].addImage(loadImage('./images/animal/chick.png'));
+        sprite_list[i].addImage(loadImage(people_path));
         sprite_list[i].scale =0.5;
         sprite_list[i].isClicked = false;
     }
@@ -99,6 +100,11 @@ function setup() {
     home_page_button.mousePressed(() => window.location.href = "index.html");
     home_page_button.hide()
 
+    restart_button = createButton("Home page");
+    restart_button.position(400, 500); 
+    restart_button.style('font-size', '50px');
+    restart_button.mousePressed(() => window.location.href = "index.html");
+    restart_button.hide()
 }
 
 function draw() {
