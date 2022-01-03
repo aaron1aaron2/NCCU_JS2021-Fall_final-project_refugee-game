@@ -1,10 +1,5 @@
-let introImgs=[];
-let click = 1;
-let now=0;
-let last_intro_page=false;
-let end_intro=false;
-
-
+let introImgs = [];
+let now = 0;
 
 function preload() {
     introImgs[0] = loadImage('./images/intro/notebook.png');
@@ -15,35 +10,51 @@ function preload() {
 
 function setup() {
     createCanvas(1000, 600);
+    /* 建立所需 buttom 並隱藏*/
+    pre_button = createButton("Prev"); //上一頁
+    pre_button.position(130, 520); 
+    pre_button.style('font-size', '30px');
+    pre_button.hide();
 
+    next_button = createButton("Next"); //下一頁
+    next_button.position(900, 520); 
+    next_button.style('font-size', '30px');
+    // next_button.style('background-color', color(128, 128, 128, 50));
+    next_button.hide();
+
+    start_button=createButton('Start'); // 開始遊戲
+    start_button.position(900,520);
+    start_button.style('font-size', '30px');
+    start_button.hide();
 }
 
 function draw() {
-
-    if(now<introImgs.length-1){
-        
-        next_button = createButton("下一頁");
-        next_button.position(900, 550); 
-        next_button.mousePressed(() => now = now+1);
-        background(introImgs[now]);
-
-        if(now===introImgs.length-1){
-            next_button.hidee();
-        }
-    }
-    else if(now===introImgs.length-1){
-        // next_button.hide();
-        last_intro_page=true;
-    }
-    if (last_intro_page){
-        next_button.hide();
-        start_button=createButton('開始遊戲');
-        start_button.position(900,550);
-        start_button.mousePressed(() => end_intro = true);
-    }
-    if (end_intro){
-        window.location.href = "index.html";
+    /* 各頁面顯示按鈕條件與動作 */
+    // 不是第一頁時
+    if (now>0) {
+        pre_button.show();
+        pre_button.mousePressed(() => now = now-1);
+    } else {
+        pre_button.hide();
     }
     
+    // 不是最後一頁時
+    if (now<introImgs.length-1){
+        next_button.show();
+        next_button.mousePressed(() => now = now+1);
+    } else {
+        next_button.hide();
+    }
+
+    // 最後一頁
+    if (now===introImgs.length-1){
+        start_button.show();
+        start_button.mousePressed(() => window.location.href = "game.html"); // 進入遊戲
+    } else{
+        start_button.hide();
+    }
+
+    /* 顯示當前頁面 */
+    background(introImgs[now]);
 }
 
