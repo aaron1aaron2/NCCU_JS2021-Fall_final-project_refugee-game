@@ -1,13 +1,27 @@
 // 變數 ===========================================
 /* 固定變數 */
-let background_img_path = './images/background.jpg';
-let palne_path = './images/UI/game/plane.png';
-let palne_colse_path = './images/UI/game/plane_close.png'; // 尚未使用
-let people_path = './images/role/people.png'
+// 遊戲中
+let game_background_img_path = './images/background.jpg';
+let game_palne_path = './images/UI/game/plane.png';
+let game_palne_colse_path = './images/UI/game/plane_close.png'; // 尚未使用
+let game_people_path = './images/role/people.png'
 
-let stop_button_path = './images/UI/game/stop.png' // 尚未使用
-let timebox_path = './images/UI/game/time_box.png' // 時間條得框  // 尚未使用
-let timebox_now_path = './images/UI/game/time_now.png' // 時間條得內容物 // 尚未使用
+let game_stop_button_path = './images/UI/game/stop.png' // 尚未使用 // 進入暫停
+let game_timebox_path = './images/UI/game/time_box.png' // 時間條得框  // 尚未使用
+let game_timebox_now_path = './images/UI/game/time_now.png' // 時間條得內容物 // 尚未使用
+
+// 暫停
+let pause_continue_button_path = './images/UI/pause/continue.png' // 繼續遊戲
+let pause_exit_button_path = './images/UI/pause/exit.png' // 回主頁面
+let pause_restart_button_path = './images/UI/pause/restart.png' // 回主頁面
+let pause_frame_path = './images/UI/pause/pause_list.png' // 暫停清單
+
+// 結果統計
+let result_exit_button_path = './images/UI/result/exit.png' // 回主頁面
+let result_restart_button_path = './images/UI/result/restart.png' // 再玩一次
+let result_success_frame_path = './images/UI/result/success.png' //成功頁面
+let result_failed_frame_path = './images/UI/result/failed.png' //成功頁面
+
 
 /* 動態變數 */
 // 角色
@@ -16,6 +30,7 @@ let sprite_list = [0,0,0,0,0,0,0,0,0,0];
 let yLabel = 350; 
 
 // 計時
+let prepare_timer = 4; // 1秒視顯示 start
 let game1_timer = 10;
 let game2_timer = 3;
 let countDownSwitch = false;
@@ -24,6 +39,8 @@ let countDownSwitch = false;
 let score = 0;
 
 // 頁面切換
+let prepare_frames = true;
+let game1_frames = false;
 let game2_frames = false;
 let result_frames = false;
 // ===============================================
@@ -56,8 +73,8 @@ function touch_detection(i) {
 
 // p5js ==========================================
 function preload() {
-    background_img = loadImage(background_img_path);
-    plane = loadImage(palne_path)
+    background_img = loadImage(game_background_img_path);
+    plane = loadImage(game_palne_path)
 
     for(let i = 0 ; i < sprite_list.length ; i++){
         let way = i % 6;
@@ -82,7 +99,7 @@ function preload() {
                 break 
             }
         sprite_list[i] = createSprite(Math.random()*1000%1000+50 ,yLabel);
-        sprite_list[i].addImage(loadImage(people_path));
+        sprite_list[i].addImage(loadImage(game_people_path));
         sprite_list[i].scale =0.5;
         sprite_list[i].isClicked = false;
     }
@@ -99,67 +116,65 @@ function setup() {
 
     /* 結果統計 - 回主頁面 */
     home_page_button = createButton("Home page");
-    home_page_button.position(400, 500); 
+    home_page_button.position(230, 500); 
     home_page_button.style('font-size', '50px');
     home_page_button.mousePressed(() => window.location.href = "index.html");
     home_page_button.hide()
 
-    restart_button = createButton("Home page");
-    restart_button.position(400, 500); 
+    restart_button = createButton("Play again");
+    restart_button.position(630, 500); 
     restart_button.style('font-size', '50px');
-    restart_button.mousePressed(() => window.location.href = "index.html");
+    restart_button.mousePressed(() => window.location.href = "game.html");
     restart_button.hide()
 }
 
 function draw() {
-    if (result_frames) {
-        /* 結果統計頁面 */
-        background(0,0,0,25);
-        fill(255, 255, 255, 10);
-        textSize(140);
-        textAlign(CENTER, CENTER);
-        text(`Score: ${score}`, 500, 300);
-        home_page_button.show()
-
-    } else if (game2_frames) {
+    if (prepare_frames) {
         /* 背景 */
         background(0,0,0,25);
         fill(255, 255, 255, 10);
+
+        /* 計時 */
         textSize(140);
         textAlign(CENTER, CENTER);
-        text(`Game 2`, 500, 300);
-        
-        /* 計時 */
-        textAlign(CENTER, CENTER);
-        textSize(100);
-        text(game2_timer, 70, 70);
-        if (frameCount % 60 == 0 && game2_timer > 0){
-            game2_timer--;
-        }
-        if (game2_timer==0){
-            game2_frames = false;
-            result_frames = true;
+        if (prepare_timer>1){
+            text(prepare_timer-1, 500, 300);
         }
 
-    } else {
+        if (frameCount % 60 == 0 && prepare_timer > 0){
+            prepare_timer--;
+        }
+        if (prepare_timer==1){
+            text('Start !', 500, 300);
+        }
+        /* 畫面切換 */
+        if (prepare_timer==0){
+            prepare_frames = false;
+            game1_frames = true;
+        }
+
+    } else if (game1_frames) {
         /* 背景 */
         background(background_img);
         image(plane, 0, 90);
 
         /* 計時 */
-        textAlign(CENTER, CENTER);
         textSize(100);
+        textAlign(CENTER, CENTER);
         text(game1_timer, 70, 70);
         if (frameCount % 60 == 0 && game1_timer > 0){
             game1_timer--;
         }
+
+        /* 畫面切換 */
         if (game1_timer==0){
+            game1_frames = false;
             game2_frames = true;
         }
 
         /* 角色 */
         for (let j = 0;j < sprite_list.length;j++) {
-            // Step 5: add code here to detect (add adjust) the mountains positions
+            // S超出界線則重製
             if (sprite_list[j].position.x >= 1000) {
                 sprite_list[j].position.x = 0;
             }
@@ -177,7 +192,38 @@ function draw() {
             }
         }
         drawSprites();
-        // console.log(score);
+
+    } else if (game2_frames) {
+        /* 背景 */
+        background(0,0,0,25);
+        fill(255, 255, 255, 10);
+        textSize(140);
+        textAlign(CENTER, CENTER);
+        text(`Game 2`, 500, 300);
+        
+        /* 計時 */
+        textAlign(CENTER, CENTER);
+        textSize(100);
+        text(game2_timer, 70, 70);
+        if (frameCount % 60 == 0 && game2_timer > 0){
+            game2_timer--;
+        }
+
+        /* 畫面切換 */
+        if (game2_timer==0){
+            game2_frames = false;
+            result_frames = true;
+        }
+
+    } else {
+        /* 結果統計頁面 */
+        background(0,0,0,25);
+        fill(255, 255, 255, 10);
+        textSize(140);
+        textAlign(CENTER, CENTER);
+        text(`Score: ${score}`, 500, 300);
+        home_page_button.show()
+        restart_button.show()
     }
 }
 // ===============================================
