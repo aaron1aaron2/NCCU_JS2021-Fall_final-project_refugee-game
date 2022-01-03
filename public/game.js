@@ -17,10 +17,19 @@ function random_move(character, heightlimit) {
     } 
 }
 
+function touch_detection(i) {
+    x_dif = Math.abs(mouseX - i.position.x);
+    y_dif = Math.abs(mouseY - i.position.y);
+    if (x_dif < 30 && y_dif < 30) {
+        i.position.x = mouseX;
+        i.position.y = mouseY;
+    } else {
+        random_move(i, 300)
+    }
+}
+
 function preload() {
-    // plane = createSprite(500, 300); 
-    // plane.addImage('plane', loadImage('./images/planeOnGround.png'));
-    // plane.addImage('plane_smile', loadImage('./images/planeSmile.png'));
+    background_img = loadImage('./images/background.jpg');
     plane = loadImage('./images/plane_fly.png')
 
     for(let i = 0 ; i < sprite_list.length ; i++){
@@ -52,13 +61,7 @@ function preload() {
         
         //sprite_list[i].setSpeed(random(5), random(360));
     }
-    // sprite_list[0] = createSprite(Math.random()*1000%1000 , Math.random()*1000%250 + 350);
-    // sprite_list[0].addImage(loadImage('./images/animal/chick.png'));
-    // sprite_list[0].setSpeed(random(5), random(360));
-    // sprite_list[1] = createSprite(Math.random()*1000%1000 , Math.random()*1000%250 + 350);
-    // sprite_list[1].addImage(loadImage('./images/animal/chick.png'));
-    // sprite_list[1].setSpeed(random(5), random(360));
-    background_img = loadImage('./images/background.jpg');
+    
     console.log(sprite_list);
 }
 
