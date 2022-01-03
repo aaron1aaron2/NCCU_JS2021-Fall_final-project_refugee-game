@@ -1,9 +1,14 @@
-let background_img;
+// 變數 ===========================================
+let background_img_path = './images/background.jpg';
+let start_game_button_path = './images/UI/start/game_start.png'; // 尚未使用
+
 let intro_started = false;
 let game_started = false;
+// ===============================================
 
+// p5js ==========================================
 function preload() {
-    background_img = loadImage('./images/background.jpg');
+    background_img = loadImage(background_img_path);
 }
 
 function setup() {
@@ -37,3 +42,4 @@ function draw() {
         window.location.href = "intro.html";
     }
 }
+// ===============================================

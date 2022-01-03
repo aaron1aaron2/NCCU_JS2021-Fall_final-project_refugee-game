@@ -1,11 +1,23 @@
+// 變數 ===========================================
+let story_page1_path = './images/UI/intro/story.png';
+let story_page2_path = './images/UI/intro/story.png';
+let story_page3_path = './images/UI/intro/story.png';
+let story_page4_path = './images/UI/intro/story.png';
+
+let next_button_path = './images/UI/intro/next.png'; // 尚未使用
+// let pre_button_path = './images/UI/intro/pre.png'; // 尚未使用
+let start_game_button_path = './images/UI/intro/start.png'; // 尚未使用
+
 let introImgs = [];
 let now = 0;
+// ===============================================
 
+// p5js ==========================================
 function preload() {
-    introImgs[0] = loadImage('./images/intro/notebook.png');
-    introImgs[1] = loadImage('./images/intro/story.png');
-    introImgs[2] = loadImage('./images/intro/story.png');
-    introImgs[3] = loadImage('./images/intro/story.png');
+    introImgs[0] = loadImage(story_page1_path);
+    introImgs[1] = loadImage(story_page2_path);
+    introImgs[2] = loadImage(story_page3_path);
+    introImgs[3] = loadImage(story_page4_path);
 }
 
 function setup() {
@@ -57,8 +69,10 @@ function draw() {
     /* 顯示當前頁面 */
     background(introImgs[now]);
 
+    // 識別文字
     textSize(140);
     textAlign(CENTER, CENTER);
     text(`${now+1}`, 500, 300);
 }
 
+// ===============================================

@@ -1,9 +1,13 @@
 // 變數 ===========================================
 /* 固定變數 */
-let result_background_img;
 let background_img_path = './images/background.jpg';
-let palne_path = './images/plane_fly.png';
-let people_path = './images/animal/chick.png'
+let palne_path = './images/UI/game/plane.png';
+let palne_colse_path = './images/UI/game/plane_close.png'; // 尚未使用
+let people_path = './images/role/people.png'
+
+let stop_button_path = './images/UI/game/stop.png' // 尚未使用
+let timebox_path = './images/UI/game/time_box.png' // 時間條得框  // 尚未使用
+let timebox_now_path = './images/UI/game/time_now.png' // 時間條得內容物 // 尚未使用
 
 /* 動態變數 */
 // 角色
@@ -24,7 +28,7 @@ let game2_frames = false;
 let result_frames = false;
 // ===============================================
 
-// 變數 ==========================================
+// 涵式 ==========================================
 function random_move(character, heightlimit) {
     if (character.position.x >= width - character.width / 2) {
         character.velocity.x = -random(12);
@@ -49,8 +53,9 @@ function touch_detection(i) {
 }
 // ===============================================
 
+
+// p5js ==========================================
 function preload() {
-    // result_background_img = loadImage('./images/annai_monitor_businessman.png');
     background_img = loadImage(background_img_path);
     plane = loadImage(palne_path)
 
@@ -88,7 +93,6 @@ function preload() {
 function setup() {
     createCanvas(1000, 600);
     plane.width = 700;
-    image(plane,0,0);
     for (let g = 0 ; g < sprite_list.length ; g++){
         sprite_list[g].setVelocity(Math.random()*100%5+6, 0);
     }
@@ -140,7 +144,7 @@ function draw() {
     } else {
         /* 背景 */
         background(background_img);
-        image(plane, 160,30);
+        image(plane, 0, 90);
 
         /* 計時 */
         textAlign(CENTER, CENTER);
@@ -176,6 +180,7 @@ function draw() {
         // console.log(score);
     }
 }
+// ===============================================
 
 
 //界線：1000 250
