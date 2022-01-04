@@ -3,24 +3,27 @@
 // 遊戲中
 let game_background_img_path = './images/background.jpg';
 let game_palne_path = './images/UI/game/plane.png';
-let game_palne_colse_path = './images/UI/game/plane_close.png'; // 尚未使用
+let game_palne_colse_path = './images/UI/game/plane_close.png'; 
+
 let game_people_path = './images/role/people.png'
 let game_bonus_soldier_path  = './images/role/soldier.png';
-let game_stop_button_path = './images/UI/game/stop.png' // 尚未使用 // 進入暫停
-let game_timebox_path = './images/UI/game/time_box.png' // 時間條得框  // 尚未使用
-let game_timebox_now_path = './images/UI/game/time_now.png' // 時間條得內容物 // 尚未使用
+
+let game_timebox_path = './images/UI/game/time_box.png' // 時間條得框
+let game_timebox_now_path = './images/UI/game/time_now.png' // 時間條得內容物
+
+let game_stop_button_path = './images/UI/game/stop.png' // 進入暫停
 
 // 暫停
 let pause_continue_button_path = './images/UI/pause/continue.png' // 繼續遊戲
 let pause_exit_button_path = './images/UI/pause/exit.png' // 回主頁面
 let pause_restart_button_path = './images/UI/pause/restart.png' // 回主頁面
-let pause_frame_path = './images/UI/pause/pause_list.png' // 暫停清單
+// let pause_frame_path = './images/UI/pause/pause_list.png' // 暫停清單
 
 // 結果統計
 let result_exit_button_path = './images/UI/result/exit.png' // 回主頁面
 let result_restart_button_path = './images/UI/result/restart.png' // 再玩一次
-let result_success_frame_path = './images/UI/result/success.png' //成功頁面
-let result_failed_frame_path = './images/UI/result/failed.png' //成功頁面
+// let result_success_frame_path = './images/UI/result/success.png' //成功頁面
+// let result_failed_frame_path = './images/UI/result/failed.png' //成功頁面
 let fireworks = [];
 
 /* 遊戲變數 */
@@ -45,7 +48,7 @@ let game1_special_role_show_timer = game1_timer/2;
 let game2_timer = 5;
 let total_game_timer = game1_timer + game2_timer;
 let time_bar_reduce_freq = Math.floor(total_game_timer/10);
-console.log(time_bar_reduce_freq)
+
 let countDownSwitch = false;
 
 let game_started = false;
@@ -115,20 +118,45 @@ class counter {
     }
 }
 
-function getCountdownTime() {
-    let now = new Date()
-    let hours = 24 - now.getHours()
-    let minutes = 60 - now.getMinutes()
-    let seconds = 60 - now.getSeconds()
-    if (hours < 10) hours = `0${hours}`
-    if (minutes < 10) minutes = `0${minutes}`
-    if (seconds < 10) seconds = `0${seconds}`
-    return `${hours}:${minutes}:${seconds}`
+function role_step(q) {
+    // S超出界線則重製
+    if (sprite_list_all[q].position.x >= 1000) {
+        sprite_list_all[q].position.x = 0;
+        // 跑完一段後隨機改變跑道 
+        sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
+    }
+    // 控制角色出現時間
+    if (sprite_list_all[q].role == "People") {
+        drawSprite(sprite_list_all[q]);
+    } else {
+        if (game1_special_role_show_timer <= 0){
+            drawSprite(sprite_list_all[q]);
+        }
+    }
+    
+    if(mouseX <= sprite_list_all[q].position.x+30 && mouseX >= sprite_list_all[q].position.x-30){
+        if(mouseY <= sprite_list_all[q].position.y+30 && mouseY >= sprite_list_all[q].position.y-30){
+            if (mouseIsPressed){
+                sprite_list_all[q].position.x = 50;
+                if (sprite_list_all[q].role == "People"){
+                    score += people_score;
+                    // popupFadeoutText(people_score, mouseX-100, mouseY+100);
+                    sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
+                }
+                else if (sprite_list_all[q].role == "Soldier"){
+                    score += soldier_score;
+                    // popupFadeoutText(soldier_score, mouseX-100, mouseY+100);
+                    sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
+                }
+            }
+        }
+    }
 }
 // p5js ==========================================
 function preload() {
     background_img = loadImage(game_background_img_path);
     plane = loadImage(game_palne_path);
+    plane_close = loadImage(game_palne_colse_path);
 
     prioritylistImage = loadImage('./images/UI/game/list_1.png');
     timeBoxImage = loadImage('./images/UI/game/time_box.png');
@@ -169,40 +197,36 @@ function setup() {
         }
     }
     /* 暫停頁面 */
-    pause_button = createButton("Pause");
-    pause_button.position(500, 100); 
-    pause_button.style('font-size', '20px');
+    // 按鈕
+    pause_button = createImg(game_stop_button_path);
+    pause_button.position(410, 90); 
     pause_button.mousePressed(() => pause_frames = true);
     pause_button.hide()
-
-    pause_continute_button = createButton("Continute");
+    
+    pause_continute_button = createImg(pause_continue_button_path);
     pause_continute_button.position(200, 500); 
-    pause_continute_button.style('font-size', '50px');
     pause_continute_button.mousePressed(() => pause_frames = false);
     pause_continute_button.hide()
 
-    pause_exit_button = createButton("Exit");
+    pause_exit_button = createImg(pause_exit_button_path);
     pause_exit_button.position(700, 500); 
-    pause_exit_button.style('font-size', '50px');
     pause_exit_button.mousePressed(() => window.location.href = "index.html");
     pause_exit_button.hide()
 
-    pause_restart_button = createButton("Restart");
+    pause_restart_button = createImg(pause_restart_button_path);
     pause_restart_button.position(470, 500); 
-    pause_restart_button.style('font-size', '50px');
     pause_restart_button.mousePressed(() => window.location.href = "game.html");
     pause_restart_button.hide()
-    
+
     /* 結果統計  */
-    home_page_button = createButton("Home page");
+
+    home_page_button = createImg(result_exit_button_path);
     home_page_button.position(230, 500); 
-    home_page_button.style('font-size', '50px');
     home_page_button.mousePressed(() => window.location.href = "index.html");
     home_page_button.hide()
 
-    restart_button = createButton("Play again");
+    restart_button = createImg(result_restart_button_path);
     restart_button.position(630, 500); 
-    restart_button.style('font-size', '50px');
     restart_button.mousePressed(() => window.location.href = "game.html");
     restart_button.hide()
 }
@@ -253,6 +277,7 @@ function draw() {
         /* 背景 */
         background(background_img);
         image(plane, 0, 90);
+
         pause_button.show();
         pause_continute_button.hide();
         pause_exit_button.hide();
@@ -264,13 +289,6 @@ function draw() {
         image(timeNowImage,time_bar_xPlace,10,time_bar_xSize,85);
 
         /* 計時 */
-        // if (game1_timer <= 5) {
-        //     fill(50);
-        //     textSize(100);
-        //     textAlign(CENTER, CENTER);
-        //     text(game1_timer, 500, 300);
-        // }
-
         if (frameCount % 60 == 0 && game1_timer > 0){
             game1_timer--;
             game1_special_role_show_timer--;
@@ -280,49 +298,16 @@ function draw() {
             }
         }
         console.log(game_counter.get_time())
+
         /* 畫面切換 */
         if (game1_timer==0){
             game1_frames = false;
             game2_frames = true;
         }
 
-        /* 角色 */
-        for (let j = 0;j < sprite_list_all.length;j++) {
-            // S超出界線則重製
-            if (sprite_list_all[j].position.x >= 1000) {
-                sprite_list_all[j].position.x = 0;
-                // 跑完一段後隨機改變跑道 
-                sprite_list_all[j].position.y = yLabelList[getRandomInt(yLabelList.length)];
-            }
-            // 控制角色出現時間
-            if (sprite_list_all[j].role == "People") {
-                drawSprite(sprite_list_all[j]);
-            } else {
-                if (game1_special_role_show_timer <= 0){
-                    drawSprite(sprite_list_all[j]);
-                }
-            }
-        }
-
         /* 玩家互動 */
-        for (let q = 0 ; q <sprite_list_all.length;q++){
-            if(mouseX <= sprite_list_all[q].position.x+30 && mouseX >= sprite_list_all[q].position.x-30){
-                if(mouseY <= sprite_list_all[q].position.y+30 && mouseY >= sprite_list_all[q].position.y-30){
-                    if (mouseIsPressed){
-                        sprite_list_all[q].position.x = 50;
-                        if (sprite_list_all[q].role == "People"){
-                            score += people_score;
-                            // popupFadeoutText(people_score, mouseX-100, mouseY+100);
-                            sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
-                        }
-                        else if (sprite_list_all[q].role == "Soldier"){
-                            score += soldier_score;
-                            // popupFadeoutText(soldier_score, mouseX-100, mouseY+100);
-                            sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
-                        }
-                    }
-                }
-            }
+        for (let q = 0 ; q < sprite_list_all.length;q++){
+            role_step(q);
         }
 
     } else if (game2_frames) {
@@ -337,7 +322,7 @@ function draw() {
 
         /* 背景 */
         background(background_img);
-        image(plane, 0, 90);
+        image(plane_close, 0, 90);
 
         pause_button.show();
         pause_continute_button.hide();
@@ -360,6 +345,11 @@ function draw() {
         if (game2_timer==0){
             game2_frames = false;
             result_frames = true;
+        }
+
+        /* 玩家互動 */
+        for (let q = 0 ; q < sprite_list_all.length;q++){
+            role_step(q);
         }
 
     } else {
