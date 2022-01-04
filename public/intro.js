@@ -4,9 +4,13 @@ let story_page2_path = './images/UI/intro/story.png';
 let story_page3_path = './images/UI/intro/story.png';
 let story_page4_path = './images/UI/intro/story.png';
 
-let next_button_path = './images/UI/intro/next.png'; // 尚未使用
-// let pre_button_path = './images/UI/intro/pre.png'; // 尚未使用
-let start_game_button_path = './images/UI/intro/start.png'; // 尚未使用
+let ui_next_button_path='./images/UI/intro/next.png';
+let ui_start_button_path = './images/UI/intro/start.png'; 
+let ui_back_game_button_path = './images/UI/intro/back.png'; 
+
+let pre_button;
+let next_button;
+let start_button;
 
 let introImgs = [];
 let now = 0;
@@ -18,25 +22,25 @@ function preload() {
     introImgs[1] = loadImage(story_page2_path);
     introImgs[2] = loadImage(story_page3_path);
     introImgs[3] = loadImage(story_page4_path);
+    
+    pre_button = createImg(ui_back_game_button_path);
+    next_button = createImg(ui_next_button_path);
+    start_button = createImg(ui_start_button_path);
 }
 
 function setup() {
     createCanvas(1000, 600);
     /* 建立所需 buttom 並隱藏*/
-    pre_button = createButton("Prev"); //上一頁
-    pre_button.position(130, 520); 
-    pre_button.style('font-size', '30px');
+    // pre_button = createButton("Prev"); //上一頁
+    pre_button.position(50, 520); 
     pre_button.hide();
 
-    next_button = createButton("Next"); //下一頁
-    next_button.position(900, 520); 
-    next_button.style('font-size', '30px');
-    // next_button.style('background-color', color(128, 128, 128, 50));
+    // next_button = createButton("Next"); //下一頁
+    next_button.position(800, 520); 
     next_button.hide();
 
-    start_button=createButton('Start'); // 開始遊戲
-    start_button.position(900,520);
-    start_button.style('font-size', '30px');
+    // start_button=createButton('Start'); // 開始遊戲
+    start_button.position(800,520);
     start_button.hide();
 }
 
