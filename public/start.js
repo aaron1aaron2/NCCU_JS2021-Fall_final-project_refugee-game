@@ -1,7 +1,7 @@
 // 變數 ===========================================
 let background_img_path = './images/background.jpg';
 let background_clouds_img_path='./images/UI/start/clouds.png'; //白雲
-let background_cloud_img_path='./images/UI/start/cloud.png'; //白雲
+// let background_cloud_img_path='./images/UI/start/cloud.png'; //白雲
 
 let start_game_button_path = './images/UI/start/game_start.png'; // 尚未使用
 let intro_game_button_path = './images/UI/start/introduction.png'; 
@@ -13,11 +13,11 @@ let game_started = false;
 // p5js ==========================================
 function preload() {
     background_img = loadImage(background_img_path);
-    background_clouds_img=createSprite(900, 250);
-    background_clouds_img.addImage(loadImage(background_clouds_img_path));
+    background_cloud1_img=createSprite(900, 190);
+    background_cloud1_img.addImage(loadImage(background_clouds_img_path));
 
-    background_cloud_img=createSprite(900, 270);
-    background_cloud_img.addImage(loadImage(background_cloud_img_path));
+    background_cloud2_img=createSprite(1500, 400);
+    background_cloud2_img.addImage(loadImage(background_clouds_img_path));
 }
 
 function setup() {
@@ -25,8 +25,8 @@ function setup() {
     background(background_img);
 
     // background cloud的 移動
-    background_clouds_img.setVelocity(-0.6, 0);
-    background_cloud_img.setVelocity(-0.8, 0);
+    background_cloud1_img.setVelocity(-0.4, 0);
+    background_cloud2_img.setVelocity(-0.6, 0);
 
 
     // button:遊戲介紹
@@ -49,11 +49,11 @@ function setup() {
 function draw() {
     // 加入會動的白雲
     background(background_img);
-    if (background_clouds_img.position.x <= 0) {
-        background_clouds_img.position.x = 1500;
+    if (background_cloud1_img.position.x <= -500) {
+        background_cloud1_img.position.x = 1500;
     }
-    if (background_cloud_img.position.x <= -200) {
-        background_cloud_img.position.x = 1200;
+    if (background_cloud2_img.position.x <= -500) {
+        background_cloud2_img.position.x = 1500;
     }
     // 標題
     drawSprites();
