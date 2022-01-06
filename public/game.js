@@ -49,15 +49,19 @@ let game2_timer = 5;
 let total_game_timer = game1_timer + game2_timer;
 let time_bar_reduce_freq = Math.floor(total_game_timer/10);
 
+let result_wait_counter = 0;
+
 let countDownSwitch = false;
 
-let game_started = false;
 
 // 計分
 let score = 0;
 let people_score = 1;
 let soldier_score = 2;
 
+// 其他
+let click_detect_border_x = 30;
+let click_detect_border_Y = 50;
 
 // 頁面切換
 let pause_frames = false;
@@ -69,29 +73,6 @@ let result_frames = false;
 // ===============================================
 
 // 涵式 ==========================================
-function random_move(character, heightlimit) {
-    if (character.position.x >= width - character.width / 2) {
-        character.velocity.x = -random(12);
-    } else if (character.position.x <= 0 + character.width / 2) {
-        character.velocity.x = random(12);
-    } else if (character.position.y >= height - (character.height/2) ) {
-        character.velocity.y = -random(7);
-    } else if (character.position.y <= heightlimit + character.height / 2) {
-        character.velocity.y = random(7);
-    } 
-}
-
-function touch_detection(i) {
-    x_dif = Math.abs(mouseX - i.position.x);
-    y_dif = Math.abs(mouseY - i.position.y);
-    if (x_dif < 30 && y_dif < 30) {
-        i.position.x = mouseX;
-        i.position.y = mouseY;
-    } else {
-        random_move(i, 300)
-    }
-}
-
 function getRandomInt(num) {
     return Math.floor(Math.random() * num);  // %5 代表num = 5 ->只會輸出0 1 2 3 4
 }
@@ -118,6 +99,29 @@ class counter {
     }
 }
 
+function click_detect() {
+    for (let q = 0 ; q < sprite_list_all.length;q++){
+        let x_loc = sprite_list_all[q].position.x
+        let y_loc = sprite_list_all[q].position.y
+
+        if(mouseX <= x_loc+click_detect_border_x+10 && mouseX >= x_loc-click_detect_border_x){
+            if(mouseY <= y_loc+click_detect_border_Y && mouseY >= y_loc-click_detect_border_Y){
+                sprite_list_all[q].position.x = 50;
+                if (sprite_list_all[q].role == "People"){
+                    score += people_score;
+                    // popupFadeoutText(people_score, mouseX-100, mouseY+100);
+                    sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
+                }
+                else if (sprite_list_all[q].role == "Soldier"){
+                    score += soldier_score;
+                    // popupFadeoutText(soldier_score, mouseX-100, mouseY+100);
+                    sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
+                }
+            }
+        }
+    }
+}
+
 function role_step(q) {
     // S超出界線則重製
     if (sprite_list_all[q].position.x >= 1000) {
@@ -134,23 +138,24 @@ function role_step(q) {
         }
     }
     
-    if(mouseX <= sprite_list_all[q].position.x+30 && mouseX >= sprite_list_all[q].position.x-30){
-        if(mouseY <= sprite_list_all[q].position.y+30 && mouseY >= sprite_list_all[q].position.y-30){
-            if (mouseIsPressed){
-                sprite_list_all[q].position.x = 50;
-                if (sprite_list_all[q].role == "People"){
-                    score += people_score;
-                    // popupFadeoutText(people_score, mouseX-100, mouseY+100);
-                    sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
-                }
-                else if (sprite_list_all[q].role == "Soldier"){
-                    score += soldier_score;
-                    // popupFadeoutText(soldier_score, mouseX-100, mouseY+100);
-                    sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
-                }
-            }
-        }
-    }
+    // if(mouseX <= sprite_list_all[q].position.x+30 && mouseX >= sprite_list_all[q].position.x-30){
+    //     if(mouseY <= sprite_list_all[q].position.y+30 && mouseY >= sprite_list_all[q].position.y-30){
+    //         if (mouseIsPressed){
+    //             // mouseIsPressed
+    //             sprite_list_all[q].position.x = 50;
+    //             if (sprite_list_all[q].role == "People"){
+    //                 score += people_score;
+    //                 // popupFadeoutText(people_score, mouseX-100, mouseY+100);
+    //                 sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
+    //             }
+    //             else if (sprite_list_all[q].role == "Soldier"){
+    //                 score += soldier_score;
+    //                 // popupFadeoutText(soldier_score, mouseX-100, mouseY+100);
+    //                 sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
+    //             }
+    //         }
+    //     }
+    // }
 }
 // p5js ==========================================
 function preload() {
@@ -269,10 +274,7 @@ function draw() {
 
     } else if (game1_frames) {
         // 遊戲一 ----------------------------------
-        if (!game_started) {
-            game_counter = new counter();
-            game_started = true;
-        }
+
 
         /* 背景 */
         background(background_img);
@@ -297,7 +299,6 @@ function draw() {
                 time_bar_xPlace += 0.7;
             }
         }
-        console.log(game_counter.get_time())
 
         /* 畫面切換 */
         if (game1_timer==0){
@@ -329,9 +330,13 @@ function draw() {
         pause_exit_button.hide();
         pause_restart_button.hide();
 
+
+        /*優先名單*/
+        image(prioritylistImage,800,30,180,230);
+
+        /* 時間條 */
         image(timeBoxImage,30,0,320,100);
         image(timeNowImage,time_bar_xPlace,10,time_bar_xSize,85);
-
         /* 計時 */
         if (frameCount % 60 == 0 && game2_timer > 0){
             game2_timer--;
@@ -360,15 +365,21 @@ function draw() {
         textSize(140);
         textAlign(CENTER, CENTER);
         text(`Score: ${score}`, 500, 300);
-        home_page_button.show();
-        restart_button.show();
+
         pause_button.hide();
         pause_continute_button.hide();
         pause_exit_button.hide();
         pause_restart_button.hide();
-        
+
         // 最後將所有累積的煙火放出來
         for (let f of fireworks) f.step()
+
+        if (frameCount % 60 == 0){result_wait_counter++}
+        // 等3秒才顯示按鈕
+        if (result_wait_counter > 3) {
+            home_page_button.show();
+            restart_button.show();
+        }
     }
 }
 // ===============================================
@@ -382,16 +393,11 @@ function mouseReleased() {
     fireworks.push(new Firework(target)) // 玩遊戲時點擊會累積煙火
 }
 
+function mouseClicked() {
+    click_detect();
+}
+
 // function mouseDragged() {
 //     chick.position.x = mouseX;
 //     chick.position.y = mouseY;
-// }
-// function mousePressed() {
-//     shape1.pressed();
-//     shape2.pressed();
-// }
-
-// function mouseReleased() {
-//     shape1.released();
-//     shape2.released();
 // }
