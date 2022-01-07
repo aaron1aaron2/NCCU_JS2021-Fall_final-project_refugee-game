@@ -356,7 +356,7 @@ function draw() {
         for (let q = 0 ; q < sprite_list_all.length;q++){
             role_step(q);
         }
-
+        
     } else {
         // 結果頁面 ----------------------------------
         /* 結果統計頁面 */
