@@ -73,10 +73,10 @@ function draw() {
     /* 顯示當前頁面 */
     background(introImgs[now]);
 
-    // 識別文字
-    textSize(140);
-    textAlign(CENTER, CENTER);
-    text(`${now+1}`, 500, 300);
+    // 識別文字(測試頁面用)
+    // textSize(140);
+    // textAlign(CENTER, CENTER);
+    // text(`${now+1}`, 500, 300);
 }
 
 // ===============================================
