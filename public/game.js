@@ -13,18 +13,20 @@ let game_timebox_now_path = './images/UI/game/time_now.png' // 時間條得內�
 
 let game_stop_button_path = './images/UI/game/stop.png' // 進入暫停
 
+let game_score_1_path='./images/UI/game/score_1.png';
+let game_score_2_path='./images/UI/game/score_2.png';
+
 // 暫停
 let pause_continue_button_path = './images/UI/pause/continue.png' // 繼續遊戲
 let pause_exit_button_path = './images/UI/pause/exit.png' // 回主頁面
 let pause_restart_button_path = './images/UI/pause/restart.png' // 回主頁面
-// let pause_frame_path = './images/UI/pause/pause_list.png' // 暫停清單
+let pause_frame_path = './images/UI/pause/pause_list.png' // 暫停清單
 
 // 結果統計
 let result_exit_button_path = './images/UI/result/exit.png' // 回主頁面
 let result_restart_button_path = './images/UI/result/restart.png' // 再玩一次
 // let result_success_frame_path = './images/UI/result/success.png' //成功頁面
 // let result_failed_frame_path = './images/UI/result/failed.png' //成功頁面
-let fireworks = [];
 
 /* 遊戲變數 */
 // 角色
@@ -63,6 +65,12 @@ let soldier_score = 2;
 let click_detect_border_x = 30;
 let click_detect_border_Y = 50;
 
+let fireworks = [];
+let max_firework_num = 10;
+
+let popup_score = [];
+let score_popup_sceond = 2;
+
 // 頁面切換
 let pause_frames = false;
 
@@ -77,14 +85,23 @@ function getRandomInt(num) {
     return Math.floor(Math.random() * num);  // %5 代表num = 5 ->只會輸出0 1 2 3 4
 }
 
-function popupFadeoutText(t, x, y) {
-    let fade = 225;
-    let fadeAmount = -20;
+// function popupFadeoutText(t, x, y) {
+//     let fade = 225;
+//     let fadeAmount = -20;
 
-    textSize(100)
-    fill(0, 255, 0, fade)
-    text(`${t}`, x, y);
-    fade += fadeAmount;
+//     textSize(100)
+//     fill(0, 255, 0, fade)
+//     text(`${t}`, x, y);
+//     fade += fadeAmount;
+// }
+
+function popupFadeoutScore(x, y, scoreImage) {
+    let s=createSprite(x,y-10, 100, 100);
+    s.addImage(scoreImage);
+    s.setVelocity(0,-5);
+    // s.life=1500;
+    s.life_sec = score_popup_sceond;
+    popup_score.push(s);
 }
 
 class counter {
@@ -109,6 +126,29 @@ function click_detect() {
                 sprite_list_all[q].position.x = 50;
                 if (sprite_list_all[q].role == "People"){
                     score += people_score;
+                    popupFadeoutScore(mouseX-10, mouseY+10, score1Image);
+                    // popupFadeoutText(people_score, mouseX-100, mouseY+100);
+                    sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
+                }
+                else if (sprite_list_all[q].role == "Soldier"){
+                    score += soldier_score;
+                    popupFadeoutScore(mouseX-10, mouseY+10, score2Image);
+                    // popupFadeoutText(soldier_score, mouseX-100, mouseY+100);
+                    sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
+                }
+            }
+        }
+    }
+}
+
+function pressed_detect(q) {
+    if(mouseX <= sprite_list_all[q].position.x+30 && mouseX >= sprite_list_all[q].position.x-30){
+        if(mouseY <= sprite_list_all[q].position.y+30 && mouseY >= sprite_list_all[q].position.y-30){
+            if (mouseIsPressed){
+                // mouseIsPressed
+                sprite_list_all[q].position.x = 50;
+                if (sprite_list_all[q].role == "People"){
+                    score += people_score;
                     // popupFadeoutText(people_score, mouseX-100, mouseY+100);
                     sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
                 }
@@ -122,6 +162,7 @@ function click_detect() {
     }
 }
 
+/* 第一階段: 角色控制 */
 function role_step(q) {
     // S超出界線則重製
     if (sprite_list_all[q].position.x >= 1000) {
@@ -138,25 +179,18 @@ function role_step(q) {
         }
     }
     
-    // if(mouseX <= sprite_list_all[q].position.x+30 && mouseX >= sprite_list_all[q].position.x-30){
-    //     if(mouseY <= sprite_list_all[q].position.y+30 && mouseY >= sprite_list_all[q].position.y-30){
-    //         if (mouseIsPressed){
-    //             // mouseIsPressed
-    //             sprite_list_all[q].position.x = 50;
-    //             if (sprite_list_all[q].role == "People"){
-    //                 score += people_score;
-    //                 // popupFadeoutText(people_score, mouseX-100, mouseY+100);
-    //                 sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
-    //             }
-    //             else if (sprite_list_all[q].role == "Soldier"){
-    //                 score += soldier_score;
-    //                 // popupFadeoutText(soldier_score, mouseX-100, mouseY+100);
-    //                 sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
-    //             }
-    //         }
-    //     }
-    // }
+    for (let q = 0 ; q < popup_score.length;q++) {
+        if (frameCount % 60 == 0) {
+            popup_score[q].life_sec --;
+        }
+        drawSprite(popup_score[q]);
+    }
+
+    popup_score = popup_score.filter((i => i.life_sec!=0))
+
+    // pressed_detect(q); // 判斷滑鼠按著
 }
+
 // p5js ==========================================
 function preload() {
     background_img = loadImage(game_background_img_path);
@@ -164,8 +198,13 @@ function preload() {
     plane_close = loadImage(game_palne_colse_path);
 
     prioritylistImage = loadImage('./images/UI/game/list_1.png');
-    timeBoxImage = loadImage('./images/UI/game/time_box.png');
-    timeNowImage = loadImage('./images/UI/game/time_now.png');
+    timeBoxImage = loadImage(game_timebox_path);
+    timeNowImage = loadImage(game_timebox_now_path);
+
+    pauseImage = loadImage(pause_frame_path);
+    score1Image = loadImage(game_score_1_path);
+    score2Image = loadImage(game_score_2_path);
+
 
     for(let i = 0 ; i < sprite_list_all.length;i++){
         let ran = getRandomInt(yLabelList.length);
@@ -277,6 +316,7 @@ function draw() {
 
 
         /* 背景 */
+        // background(0,0,0,25);
         background(background_img);
         image(plane, 0, 90);
 
@@ -329,7 +369,6 @@ function draw() {
         pause_continute_button.hide();
         pause_exit_button.hide();
         pause_restart_button.hide();
-
 
         /*優先名單*/
         image(prioritylistImage,800,30,180,230);
@@ -384,13 +423,16 @@ function draw() {
 }
 // ===============================================
 
-
 function mouseReleased() {
     let target = {
         x: mouseX,
         y: mouseY
     }
-    fireworks.push(new Firework(target)) // 玩遊戲時點擊會累積煙火
+    if (fireworks.length > max_firework_num) {
+        let rm_idx = getRandomInt(max_firework_num);
+        fireworks.splice(rm_idx, 1);
+    }
+    fireworks.push(new Firework(target)); // 玩遊戲時點擊會累積煙火
 }
 
 function mouseClicked() {
