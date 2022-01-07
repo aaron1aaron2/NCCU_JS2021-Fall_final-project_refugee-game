@@ -2,7 +2,7 @@
 let story_page1_path = './images/UI/intro/story.png';
 let story_page2_path = './images/UI/intro/story.png';
 let story_page3_path = './images/UI/intro/story.png';
-let story_page4_path = './images/UI/intro/story.png';
+let story_page4_path = './images/UI/intro/game_rule.png';
 
 let ui_next_button_path='./images/UI/intro/next.png';
 let ui_start_button_path = './images/UI/intro/start.png'; 
