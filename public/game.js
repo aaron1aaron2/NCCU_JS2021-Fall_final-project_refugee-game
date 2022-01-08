@@ -238,15 +238,15 @@ function prioritylist_step() {
     soldier_leftover = soldier_target_num - soldier_count
     greencard_leftover = greencard_target_num - greencard_count
     if (soldier_leftover>0) {
-        text(`X ${soldier_leftover}/${soldier_target_num}`, 880, 95);
+        text(`X ${soldier_leftover}/${soldier_target_num}`, 880, 110);
     } else {
         text(`Good!`, 880, 95);
     }
 
     if (greencard_leftover>0) {
-        text(`X ${greencard_leftover}/${greencard_target_num}`, 880, 125);
+        text(`X ${greencard_leftover}/${greencard_target_num}`, 880, 160);
     } else {
-        text(`Good!`, 880, 125);
+        text(`Good!`, 880, 150);
     }
 }
 
