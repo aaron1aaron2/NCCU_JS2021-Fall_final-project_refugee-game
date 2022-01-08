@@ -5,6 +5,8 @@ let game_background_img_path = './images/background.jpg';
 let game_palne_path = './images/UI/game/plane.png';
 let game_palne_colse_path = './images/UI/game/plane_close.png'; 
 let game_people_path = './images/role/people.png'
+let game_people_back_path = './images/role/people_back.png'
+let game_bonus_greencard_path  = './images/role/Green_Card_Citizen.png';
 let game_bonus_soldier_path  = './images/role/soldier.png';
 
 let game_timebox_path = './images/UI/game/time_box.png' // 時間條得框
@@ -12,8 +14,8 @@ let game_timebox_now_path = './images/UI/game/time_now.png' // 時間條得內�
 
 let game_stop_button_path = './images/UI/game/stop.png' // 進入暫停
 
-let game_score_1_path='./images/UI/game/score_1.png';
-let game_score_2_path='./images/UI/game/score_2.png';
+let game_score_1_path = './images/UI/game/score_1.png';
+let game_score_2_path = './images/UI/game/score_2.png';
 
 let priority_list_path = './images/UI/game/list_1.png'
 
@@ -33,7 +35,8 @@ let result_failed_frame_path = './images/UI/result/failed.png' //成功頁面
 // 角色
 let sprite_list = [0,0,0,0,0,0,0,0,0,0];
 let sprite_list_bonus = [0]; //要加新角色就多用一個list
-let sprite_list_all = [...sprite_list,...sprite_list_bonus];
+let sprite_list_bonus2 = [0,0,0]; //要加新角色就多用一個list
+let sprite_list_all = [...sprite_list,...sprite_list_bonus,...sprite_list_bonus2];
 
 // let xLable
 let yLabel = 350; 
@@ -46,27 +49,45 @@ let time_bar_xSize = 315;
 let time_bar_xPlace = 33;
 
 let prepare_timer = 4; // 1秒視顯示 start
-let game1_timer = 25;
-let game1_special_role_show_timer = game1_timer/2;
+let game1_timer = 15;
+let game1_special_role_show_timer = game1_timer/2; // 特殊角色出現時間(軍人)
 
 let game2_timer = 5;
 let total_game_timer = game1_timer + game2_timer;
 game2_timer+=1; // 緩衝
-let time_bar_reduce_freq = total_game_timer/10;
-let time_bar_counter = 1;
+
 let result_wait_counter = 0;
 
-let game_start_frame = 0;
 let countDownSwitch = false;
 
+// 時間條
+let game_start_frame = 0;
+let time_bar_reduce_freq = total_game_timer/10;
+let time_bar_counter = 1;
+
+// 優先名單
+let soldier_target_num = 5;
+let greencard_target_num = 10;
+let people_count = 0;
+let soldier_count = 0;
+let greencard_count = 0;
+let soldier_leftover = soldier_target_num - soldier_count;
+let greencard_leftover = soldier_target_num - soldier_count;
 
 // 計分
 let score = 0;
-let people_count = 0;
-let soldier_count = 0;
 
-let people_score = 1;
-let soldier_score = 2;
+
+// let people_score = 1;
+// let soldier_score = 2;
+
+// 頁面切換
+let pause_frames = false;
+
+let prepare_frames = true;
+let game1_frames = false;
+let game2_frames = false;
+let result_frames = false;
 
 // 其他
 let click_detect_border_x = 30;
@@ -79,14 +100,6 @@ let popup_score = [];
 let score_popup_sceond = 2;
 let people_die_num = 0;
 let mession_result = true;
-
-// 頁面切換
-let pause_frames = false;
-
-let prepare_frames = true;
-let game1_frames = false;
-let game2_frames = false;
-let result_frames = false;
 // ===============================================
 
 // 涵式 ==========================================
@@ -117,16 +130,26 @@ function click_detect() {
                 } else {
                     sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
                 }
-                if (sprite_list_all[q].role == "People"){
-                    score += people_score;
-                    people_count += 1;
-                    popupFadeoutScore(mouseX, mouseY, score1Image);
-                }
-                else if (sprite_list_all[q].role == "Soldier"){
-                    score += soldier_score;
-                    soldier_count += 1;
-                    popupFadeoutScore(mouseX, mouseY, score2Image);
-                }
+                /* 平等加分 */
+                score += 1;
+                popupFadeoutScore(mouseX, mouseY, score1Image);
+
+                if (sprite_list_all[q].role == "People"){people_count += 1}
+                if (sprite_list_all[q].role == "Soldier"){soldier_count += 1}
+                if (sprite_list_all[q].role == "Greencard"){greencard_count += 1}
+
+
+                /* 不平等加分 */
+                // if (sprite_list_all[q].role == "People"){
+                //     score += 1;
+                //     people_count += 1;
+                //     popupFadeoutScore(mouseX, mouseY, score1Image);
+                // }
+                // else if (sprite_list_all[q].role == "Soldier"){
+                //     score += 2;
+                //     soldier_count += 1;
+                //     popupFadeoutScore(mouseX, mouseY, score2Image);
+                // }
             }
         }
     }
@@ -162,13 +185,18 @@ function role_step(q) {
         sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
     }
 
+    // 開始出現設定
     if (sprite_list_all[q].role == "People") {
         drawSprite(sprite_list_all[q]);
-    } else {
-        if (game1_special_role_show_timer <= 0){
+    } else if (sprite_list_all[q].role == "Soldier") {
+        if ((game1_special_role_show_timer <= 0) && (soldier_count < soldier_target_num)){
             drawSprite(sprite_list_all[q]);
         }
-    }   
+    }  else {
+        if (greencard_count < greencard_target_num) {
+            drawSprite(sprite_list_all[q]);
+        }
+    }
 
     for (let q = 0 ; q < popup_score.length;q++) {
         if (frameCount % 60 == 0) {
@@ -182,30 +210,44 @@ function role_step(q) {
     // pressed_detect(q); // 判斷滑鼠按著
 }
 
-function run_way(g,move_speed_people_x,move_speed_people_y,move_speed_soldier_x,move_speed_soldier_y){
-    if (sprite_list_all[g].role == "People"){
-        sprite_list_all[g].setVelocity(move_speed_people_x,move_speed_people_y);
-    }
-    else if (sprite_list_all[g].role == "Soldier"){
-        sprite_list_all[g].setVelocity(move_speed_soldier_x, move_speed_soldier_y);
-    }
-
+function run_way(g,move_speed_people_x,move_speed_people_y){
+    sprite_list_all[g].setVelocity(move_speed_people_x,move_speed_people_y);
 }
 
 function role_step2(g) {
     if (sprite_list_all[g].position.x > 10 && sprite_list_all[g].position.x <900){
         if(sprite_list_all[g].position.y >300){
-            run_way(g,(500-sprite_list_all[g].position.x)/400  ,(Math.random()*100%5-people_run_speed_base)/5, (500-sprite_list_all[g].position.x)/500 ,(Math.random()*100%5-soldier_run_speed_base)/5 );                
+            run_way(g,(500-sprite_list_all[g].position.x)/400  ,(Math.random()*100%5-people_run_speed_base)/5);                
         }
         else{
             run_way(g,0,0,0,0);
         }
             
     }
+
     if(sprite_list_all[g].position.y > 350){
         sprite_list_all[g].scale *= 0.999;
         //sprite_list_all[g].scale *= (0.999-0.0003*((600-sprite_list_all[g].position.y)/600));
     }  
+}
+function prioritylist_step() {
+    image(prioritylistImage,800,30,180,230);
+    textSize(20);
+    fill(0, 0, 0, 150);
+    textAlign(LEFT, CENTER);
+    soldier_leftover = soldier_target_num - soldier_count
+    greencard_leftover = greencard_target_num - greencard_count
+    if (soldier_leftover>0) {
+        text(`X ${soldier_leftover}/${soldier_target_num}`, 880, 95);
+    } else {
+        text(`Good!`, 880, 95);
+    }
+
+    if (greencard_leftover>0) {
+        text(`X ${greencard_leftover}/${greencard_target_num}`, 880, 125);
+    } else {
+        text(`Good!`, 880, 125);
+    }
 }
 
 // p5js ==========================================
@@ -227,30 +269,39 @@ function preload() {
     peopleImage = loadImage(game_people_path);
     soldierImage = loadImage(game_bonus_soldier_path);
 
+    people_num = sprite_list.length
+    soldier_num = sprite_list_bonus.length
+
     for(let i = 0 ; i < sprite_list_all.length;i++){
         let ran = getRandomInt(yLabelList.length);
 
         /*如果要加角色要在這裡加入新的*/
-        if (i < sprite_list.length){
+        if (i < people_num){
             sprite_list_all[i] = createSprite(Math.random()*1000%1000+50, yLabelList[ran]);
             sprite_list_all[i].addImage(loadImage(game_people_path));
             sprite_list_all[i].role = "People";   
             sprite_list_all[i].scale =0.3;
-            sprite_list_all[i].isClicked = false;            
+            // sprite_list_all[i].isClicked = false;        
         }
-        else if (i >= sprite_list.length && i < sprite_list_all.length){
+        else if (i >= people_num && i < (people_num+soldier_num)){
             sprite_list_all[i] = createSprite(Math.random()*1000%1000+50, yLabelList[ran]);
             sprite_list_all[i].addImage(loadImage(game_bonus_soldier_path));
             sprite_list_all[i].role = "Soldier";
             sprite_list_all[i].scale = 0.3;
-            sprite_list_all[i].isClicked = false;
+            // sprite_list_all[i].isClicked = false;
+        } else {
+            sprite_list_all[i] = createSprite(Math.random()*1000%1000+50, yLabelList[ran]);
+            sprite_list_all[i].addImage(loadImage(game_bonus_greencard_path));
+            sprite_list_all[i].role = "Greencard";
+            sprite_list_all[i].scale = 0.3;
+            // sprite_list_all[i].isClicked = false;
         }
     }
 }
 
 function setup() {
     createCanvas(1000, 600);
-    plane.width = 700;
+    // plane.width = 700;
 
     /* 角色移動 */ 
     for (let g = 0 ; g < sprite_list_all.length ; g++){
@@ -259,6 +310,8 @@ function setup() {
         }
         else if (sprite_list_all[g].role == "Soldier"){
             sprite_list_all[g].setVelocity(Math.random()*100%5+soldier_run_speed_base, 0);
+        } else {
+            sprite_list_all[g].setVelocity(Math.random()*100%5+people_run_speed_base, 0);
         }
     }
     /* 暫停頁面 */
@@ -348,7 +401,9 @@ function draw() {
         /* 背景 */
         // background(0,0,0,25);
         background(background_img);
-        image(plane, 0, 90);
+        // image(plane, 0, 90);
+        image(plane, 0, 50);
+
 
         pause_button.show();
         pause_continute_button.hide();
@@ -357,7 +412,7 @@ function draw() {
         pause_list_frame.hide();
 
         /*優先名單*/
-        image(prioritylistImage,800,30,180,230);
+        prioritylist_step();
 
         /* 時間條 */
         if ((frameCount-game_start_frame) > (time_bar_reduce_freq*time_bar_counter*60)) {
@@ -372,7 +427,6 @@ function draw() {
         if (frameCount % 60 == 0 && game1_timer > 0){
             game1_timer--;
             game1_special_role_show_timer--;
-
         }
 
 
@@ -399,7 +453,8 @@ function draw() {
 
         /* 背景 */
         background(background_img);
-        image(plane_close, 0, 90);
+        // image(plane_close, 0, 90);
+        image(plane_close, 0, 50);
 
         pause_button.show();
         pause_continute_button.hide();
@@ -408,7 +463,7 @@ function draw() {
         pause_list_frame.hide();
 
         /*優先名單*/
-        image(prioritylistImage,800,30,180,230);
+        prioritylist_step();
 
         /* 時間條 */
         if ((frameCount-game_start_frame) > (time_bar_reduce_freq*time_bar_counter*60)) {
@@ -431,9 +486,15 @@ function draw() {
         if (game2_timer==0){
             game2_frames = false;
             result_frames = true;
+
+            // 剩下的扣分
             people_die_num = sprite_list_all.filter((i => !i.hide)).length
             score -= people_die_num
-            mession_result = (people_die_num==0);
+            
+            // 輸贏判斷
+            soldier_leftover = soldier_target_num - soldier_count
+            greencard_leftover = greencard_target_num - greencard_count
+            mession_result = ((soldier_leftover<=0) && (greencard_leftover<=0));
         }
 
         /* 玩家互動 */
