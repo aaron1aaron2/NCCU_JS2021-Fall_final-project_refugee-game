@@ -34,6 +34,7 @@ let result_failed_frame_path = './images/UI/result/failed.png' //成功頁面
 let sprite_list = [0,0,0,0,0,0,0,0,0,0];
 let sprite_list_bonus = [0]; //要加新角色就多用一個list
 let sprite_list_all = [...sprite_list,...sprite_list_bonus];
+
 // let xLable
 let yLabel = 350; 
 let yLabelList = [350,400,450,500,550];
@@ -45,15 +46,17 @@ let time_bar_xSize = 315;
 let time_bar_xPlace = 33;
 
 let prepare_timer = 4; // 1秒視顯示 start
-let game1_timer = 3;
+let game1_timer = 25;
 let game1_special_role_show_timer = game1_timer/2;
 
-let game2_timer = 3;
+let game2_timer = 5;
 let total_game_timer = game1_timer + game2_timer;
-let time_bar_reduce_freq = Math.floor(total_game_timer/10);
-
+game2_timer+=1; // 緩衝
+let time_bar_reduce_freq = total_game_timer/10;
+let time_bar_counter = 1;
 let result_wait_counter = 0;
 
+let game_start_frame = 0;
 let countDownSwitch = false;
 
 
@@ -74,6 +77,8 @@ let max_firework_num = 10;
 
 let popup_score = [];
 let score_popup_sceond = 2;
+let people_die_num = 0;
+let mession_result = true;
 
 // 頁面切換
 let pause_frames = false;
@@ -106,17 +111,21 @@ function click_detect() {
         if(mouseX <= x_loc+click_detect_border_x+10 && mouseX >= x_loc-click_detect_border_x){
             if(mouseY <= y_loc+click_detect_border_Y && mouseY >= y_loc-click_detect_border_Y){
                 sprite_list_all[q].position.x = 50;
+                if (game2_frames) {
+                    sprite_list_all[q].position.y = 1000;
+                    sprite_list_all[q].hide = true;
+                } else {
+                    sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
+                }
                 if (sprite_list_all[q].role == "People"){
                     score += people_score;
                     people_count += 1;
                     popupFadeoutScore(mouseX, mouseY, score1Image);
-                    sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
                 }
                 else if (sprite_list_all[q].role == "Soldier"){
                     score += soldier_score;
                     soldier_count += 1;
                     popupFadeoutScore(mouseX, mouseY, score2Image);
-                    sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
                 }
             }
         }
@@ -152,15 +161,15 @@ function role_step(q) {
         // 跑完一段後隨機改變跑道 
         sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
     }
-    // 控制角色出現時間
+
     if (sprite_list_all[q].role == "People") {
         drawSprite(sprite_list_all[q]);
     } else {
         if (game1_special_role_show_timer <= 0){
             drawSprite(sprite_list_all[q]);
         }
-    }
-    
+    }   
+
     for (let q = 0 ; q < popup_score.length;q++) {
         if (frameCount % 60 == 0) {
             popup_score[q].life_sec --;
@@ -171,6 +180,32 @@ function role_step(q) {
     popup_score = popup_score.filter((i => i.life_sec!=0))
 
     // pressed_detect(q); // 判斷滑鼠按著
+}
+
+function run_way(g,move_speed_people_x,move_speed_people_y,move_speed_soldier_x,move_speed_soldier_y){
+    if (sprite_list_all[g].role == "People"){
+        sprite_list_all[g].setVelocity(move_speed_people_x,move_speed_people_y);
+    }
+    else if (sprite_list_all[g].role == "Soldier"){
+        sprite_list_all[g].setVelocity(move_speed_soldier_x, move_speed_soldier_y);
+    }
+
+}
+
+function role_step2(g) {
+    if (sprite_list_all[g].position.x > 10 && sprite_list_all[g].position.x <900){
+        if(sprite_list_all[g].position.y >300){
+            run_way(g,(500-sprite_list_all[g].position.x)/400  ,(Math.random()*100%5-people_run_speed_base)/5, (500-sprite_list_all[g].position.x)/500 ,(Math.random()*100%5-soldier_run_speed_base)/5 );                
+        }
+        else{
+            run_way(g,0,0,0,0);
+        }
+            
+    }
+    if(sprite_list_all[g].position.y > 350){
+        sprite_list_all[g].scale *= 0.999;
+        //sprite_list_all[g].scale *= (0.999-0.0003*((600-sprite_list_all[g].position.y)/600));
+    }  
 }
 
 // p5js ==========================================
@@ -187,6 +222,7 @@ function preload() {
     timeNowImage = loadImage(game_timebox_now_path);
 
     result_success_frame = loadImage(result_success_frame_path);
+    result_failed_frame = loadImage(result_failed_frame_path);
     
     peopleImage = loadImage(game_people_path);
     soldierImage = loadImage(game_bonus_soldier_path);
@@ -305,6 +341,9 @@ function draw() {
     } else if (game1_frames) {
         // 遊戲一 ----------------------------------
 
+        if (game_start_frame==0){
+            game_start_frame = frameCount
+        }
 
         /* 背景 */
         // background(0,0,0,25);
@@ -319,6 +358,13 @@ function draw() {
 
         /*優先名單*/
         image(prioritylistImage,800,30,180,230);
+
+        /* 時間條 */
+        if ((frameCount-game_start_frame) > (time_bar_reduce_freq*time_bar_counter*60)) {
+            time_bar_counter += 1;
+            time_bar_xSize -= 30;
+            time_bar_xPlace += 0.7;
+        }
         image(timeBoxImage,30,0,320,100);
         image(timeNowImage,time_bar_xPlace,10,time_bar_xSize,85);
 
@@ -326,11 +372,9 @@ function draw() {
         if (frameCount % 60 == 0 && game1_timer > 0){
             game1_timer--;
             game1_special_role_show_timer--;
-            if (frameCount % time_bar_reduce_freq == 0) {
-                time_bar_xSize -= 30;
-                time_bar_xPlace += 0.7;
-            }
+
         }
+
 
         /* 畫面切換 */
         if (game1_timer==0){
@@ -367,25 +411,34 @@ function draw() {
         image(prioritylistImage,800,30,180,230);
 
         /* 時間條 */
+        if ((frameCount-game_start_frame) > (time_bar_reduce_freq*time_bar_counter*60)) {
+            time_bar_counter += 1;
+            time_bar_xSize -= 30;
+            time_bar_xPlace += 0.7;
+        }
+
         image(timeBoxImage,30,0,320,100);
-        image(timeNowImage,time_bar_xPlace,10,time_bar_xSize,85);
+        if (game2_timer > 1) {
+            image(timeNowImage,time_bar_xPlace,10,time_bar_xSize,85);
+        }
+
         /* 計時 */
         if (frameCount % 60 == 0 && game2_timer > 0){
             game2_timer--;
-            if (frameCount % time_bar_reduce_freq == 0) {
-                time_bar_xSize -= 30;
-                time_bar_xPlace += 0.7;
-            }
         }
 
         /* 畫面切換 */
         if (game2_timer==0){
             game2_frames = false;
             result_frames = true;
+            people_die_num = sprite_list_all.filter((i => !i.hide)).length
+            score -= people_die_num
+            mession_result = (people_die_num==0);
         }
 
         /* 玩家互動 */
         for (let q = 0 ; q < sprite_list_all.length;q++){
+            role_step2(q);
             role_step(q);
         }
         
@@ -399,8 +452,12 @@ function draw() {
 
         // 等3秒才顯示按鈕
         if (result_wait_counter > 3) {
-            background(result_success_frame);
-            // image(result_success_frame, 250, 50)
+            if (mession_result){
+                background(result_success_frame);
+            } else {
+                background(result_failed_frame);
+            }
+
             image(peopleImage, 400, 200, 50, 90)
             image(soldierImage, 400, 300, 50, 90)
 
@@ -419,9 +476,10 @@ function draw() {
             textAlign(CENTER, CENTER);
             text(`Score: ${score}`, 500, 300);
         }
-
-        // 最後將所有累積的煙火放出來
-        for (let f of fireworks) f.step()
+        // 成功的話最後將所有累積的煙火放出來
+        if (mession_result){
+            for (let f of fireworks) f.step()
+        }
 
         // 計時
         if (frameCount % 60 == 0){result_wait_counter++}
