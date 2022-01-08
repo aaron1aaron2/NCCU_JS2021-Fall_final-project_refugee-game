@@ -1,7 +1,7 @@
 // 變數 ===========================================
-let story_page1_path = './images/UI/intro/story.png';
-let story_page2_path = './images/UI/intro/story.png';
-let story_page3_path = './images/UI/intro/story.png';
+let story_page1_path = './images/UI/intro/story1.jpg';
+let story_page2_path = './images/UI/intro/story2.jpg';
+let story_page3_path = './images/UI/intro/story3.jpg';
 let story_page4_path = './images/UI/intro/game_rule.png';
 
 let ui_next_button_path='./images/UI/intro/next.png';
@@ -22,25 +22,24 @@ function preload() {
     introImgs[1] = loadImage(story_page2_path);
     introImgs[2] = loadImage(story_page3_path);
     introImgs[3] = loadImage(story_page4_path);
-    
-    pre_button = createImg(ui_back_game_button_path);
-    next_button = createImg(ui_next_button_path);
-    start_button = createImg(ui_start_button_path);
 }
 
 function setup() {
     createCanvas(1000, 600);
     /* 建立所需 buttom 並隱藏*/
     // pre_button = createButton("Prev"); //上一頁
-    pre_button.position(50, 520); 
+    pre_button = createImg(ui_back_game_button_path);
+    pre_button.position(34, 600); 
     pre_button.hide();
 
     // next_button = createButton("Next"); //下一頁
-    next_button.position(800, 520); 
+    next_button = createImg(ui_next_button_path);
+    next_button.position(800, 600); 
     next_button.hide();
 
     // start_button=createButton('Start'); // 開始遊戲
-    start_button.position(800,520);
+    start_button = createImg(ui_start_button_path);
+    start_button.position(800, 600);
     start_button.hide();
 }
 
