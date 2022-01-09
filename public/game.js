@@ -28,8 +28,8 @@ let pause_frame_path = './images/UI/pause/pause_list.png' // 暫停清單
 // 結果統計
 let result_exit_button_path = './images/UI/result/exit.png' // 回主頁面
 let result_restart_button_path = './images/UI/result/restart.png' // 再玩一次
-let result_success_frame_path = './images/UI/result/success.png' //成功頁面
-let result_failed_frame_path = './images/UI/result/failed.png' //成功頁面
+let result_success_frame_path = './images/UI/result/success_plus.png' //成功頁面
+let result_failed_frame_path = './images/UI/result/failed_plus.png' //成功頁面
 
 /* 遊戲變數 */
 // 角色
@@ -41,7 +41,7 @@ let sprite_list_all = [...sprite_list,...sprite_list_bonus,...sprite_list_bonus2
 // let xLable
 let yLabel = 350; 
 let yLabelList = [350,400,450,500,550];
-let people_run_speed_base = 6; // 公式: Math.random()*100%5 + base speed
+let people_run_speed_base = 10; // 公式: Math.random()*100%5 + base speed
 let soldier_run_speed_base = 18;
 
 // 計時
@@ -54,7 +54,6 @@ let game1_special_role_show_timer = game1_timer/2; // 特殊角色出現時間(�
 
 let game2_timer = 5;
 let total_game_timer = game1_timer + game2_timer;
-game2_timer+=1; // 緩衝
 
 let result_wait_counter = 0;
 
@@ -124,7 +123,7 @@ function click_detect() {
         if(mouseX <= x_loc+click_detect_border_x+10 && mouseX >= x_loc-click_detect_border_x){
             if(mouseY <= y_loc+click_detect_border_Y && mouseY >= y_loc-click_detect_border_Y){
                 sprite_list_all[q].position.x = 50;
-                if (game2_frames) {
+                if (game2_frames || result_frames) {
                     sprite_list_all[q].position.y = 1000;
                     sprite_list_all[q].hide = true;
                 } else {
@@ -215,9 +214,12 @@ function run_way(g,move_speed_people_x,move_speed_people_y){
 }
 
 function role_step2(g) {
+    if (sprite_list_all[g].role == 'People'){
+        sprite_list_all[g].changeImage('people_back');
+    }
     if (sprite_list_all[g].position.x > 10 && sprite_list_all[g].position.x <900){
         if(sprite_list_all[g].position.y >300){
-            run_way(g,(500-sprite_list_all[g].position.x)/400  ,(Math.random()*100%5-people_run_speed_base)/5);                
+            run_way(g,(300-sprite_list_all[g].position.x)/200  ,(Math.random()*100%5-people_run_speed_base)/5);                
         }
         else{
             run_way(g,0,0,0,0);
@@ -238,13 +240,13 @@ function prioritylist_step() {
     soldier_leftover = soldier_target_num - soldier_count
     greencard_leftover = greencard_target_num - greencard_count
     if (soldier_leftover>0) {
-        text(`X ${soldier_leftover}/${soldier_target_num}`, 880, 110);
+        text(`x ${soldier_leftover}/${soldier_target_num}`, 880, 100);
     } else {
         text(`Good!`, 880, 95);
     }
 
     if (greencard_leftover>0) {
-        text(`X ${greencard_leftover}/${greencard_target_num}`, 880, 160);
+        text(`x ${greencard_leftover}/${greencard_target_num}`, 880, 150);
     } else {
         text(`Good!`, 880, 150);
     }
@@ -279,6 +281,7 @@ function preload() {
         if (i < people_num){
             sprite_list_all[i] = createSprite(Math.random()*1000%1000+50, yLabelList[ran]);
             sprite_list_all[i].addImage(loadImage(game_people_path));
+            sprite_list_all[i].addImage('people_back',loadImage(game_people_back_path));
             sprite_list_all[i].role = "People";   
             sprite_list_all[i].scale =0.3;
             // sprite_list_all[i].isClicked = false;        
@@ -343,12 +346,12 @@ function setup() {
     /* 結果統計  */
 
     home_page_button = createImg(result_exit_button_path);
-    home_page_button.position(320, 500); 
+    home_page_button.position(550, 550); 
     home_page_button.mousePressed(() => window.location.href = "index.html");
     home_page_button.hide()
 
     restart_button = createImg(result_restart_button_path);
-    restart_button.position(550, 500); 
+    restart_button.position(780, 550); 
     restart_button.mousePressed(() => window.location.href = "game.html");
     restart_button.hide()
 }
@@ -423,6 +426,7 @@ function draw() {
         image(timeBoxImage,30,0,320,100);
         image(timeNowImage,time_bar_xPlace,10,time_bar_xSize,85);
 
+ 
         /* 計時 */
         if (frameCount % 60 == 0 && game1_timer > 0){
             game1_timer--;
@@ -430,10 +434,18 @@ function draw() {
         }
 
 
+
         /* 畫面切換 */
         if (game1_timer==0){
+            for (let b = 0 ; b < sprite_list_all.length ;b++ ){
+                if (sprite_list_all[b].role == 'Soldier' || sprite_list_all[b].role == "Greencard"){
+                    sprite_list_all.splice(b,1);
+                    b -= 1 ;
+                }
+            }
             game1_frames = false;
             game2_frames = true;
+
         }
 
         /* 玩家互動 */
@@ -452,6 +464,7 @@ function draw() {
         // text(`Game 2`, 500, 300);
 
         /* 背景 */
+
         background(background_img);
         // image(plane_close, 0, 90);
         image(plane_close, 0, 50);
@@ -515,27 +528,33 @@ function draw() {
         if (result_wait_counter > 3) {
             if (mession_result){
                 background(result_success_frame);
+                fill('#feefd9');
             } else {
                 background(result_failed_frame);
+                fill('#2850ab');
             }
 
-            image(peopleImage, 400, 200, 50, 90)
-            image(soldierImage, 400, 300, 50, 90)
+            //image(peopleImage, 400, 200, 50, 90)
+            //image(soldierImage, 400, 300, 50, 90)
 
             home_page_button.show();
             restart_button.show();
-
             textSize(60);
-            fill(0, 0, 0, 150);
+            //fill('#2850ab');
+            //fill(0, 0, 0, 150);
             textAlign(LEFT, CENTER);
-            text(`X ${people_count}`, 500, 250);
-            text(`X ${soldier_count}`, 500, 350);
+            text(`${people_count}`, 340, 220);
+            text(`${soldier_count}`, 340, 310);
+            text(`${greencard_count}`, 340, 410);
+            text(`${people_die_num}`, 340, 500);
+            textSize(120);
+            text(`${score}`, 660, 350);
         } else {
             background(0,0,0,25);
             fill(255, 255, 255, 10);
             textSize(140);
             textAlign(CENTER, CENTER);
-            text(`Score: ${score}`, 500, 300);
+            text(`Score : ${score}`, 500, 300);
         }
         // 成功的話最後將所有累積的煙火放出來
         if (mession_result){
