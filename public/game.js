@@ -49,7 +49,7 @@ let time_bar_xSize = 315;
 let time_bar_xPlace = 33;
 
 let prepare_timer = 4; // 1秒視顯示 start
-let game1_timer = 15;
+let game1_timer = 25;
 let game1_special_role_show_timer = game1_timer/2; // 特殊角色出現時間(軍人)
 
 let game2_timer = 5;
@@ -124,7 +124,7 @@ function click_detect() {
             if(mouseY <= y_loc+click_detect_border_Y && mouseY >= y_loc-click_detect_border_Y){
                 sprite_list_all[q].position.x = 50;
                 if (game2_frames || result_frames) {
-                    sprite_list_all[q].position.y = 1000;
+                    sprite_list_all[q].position.y = 1500;
                     sprite_list_all[q].hide = true;
                 } else {
                     sprite_list_all[q].position.y = yLabelList[getRandomInt(yLabelList.length)];
@@ -175,6 +175,15 @@ function click_detect() {
 //     }
 // }
 
+function run_way(g,move_speed_people_x,move_speed_people_y){
+    sprite_list_all[g].setVelocity(move_speed_people_x,move_speed_people_y);
+}
+
+function record_pause(){
+    pause_frames = false;
+    frameRate(60);
+}
+
 /* 第一階段: 角色控制 */
 function role_step(q) {
     // S超出界線則重製
@@ -185,16 +194,24 @@ function role_step(q) {
     }
 
     // 開始出現設定
-    if (sprite_list_all[q].role == "People") {
-        drawSprite(sprite_list_all[q]);
-    } else if (sprite_list_all[q].role == "Soldier") {
-        if ((game1_special_role_show_timer <= 0) && (soldier_count < soldier_target_num)){
+    if (!sprite_list_all[q].hide) {
+        if (sprite_list_all[q].role == "People") {
             drawSprite(sprite_list_all[q]);
+        } else if (sprite_list_all[q].role == "Soldier") {
+            if ((game1_special_role_show_timer <= 0) && (soldier_count < soldier_target_num)){
+                drawSprite(sprite_list_all[q]);
+            } else {
+                sprite_list_all[q].position.y = 1500;
+            }
+        }  else if (sprite_list_all[q].role == "Greencard"){
+            if (greencard_count < greencard_target_num) {
+                drawSprite(sprite_list_all[q]);
+            } else {
+                sprite_list_all[q].position.y = 1500;
+            }
         }
-    }  else {
-        if (greencard_count < greencard_target_num) {
-            drawSprite(sprite_list_all[q]);
-        }
+    } else {
+        sprite_list_all[q].position.y = 1500;
     }
 
     for (let q = 0 ; q < popup_score.length;q++) {
@@ -209,9 +226,7 @@ function role_step(q) {
     // pressed_detect(q); // 判斷滑鼠按著
 }
 
-function run_way(g,move_speed_people_x,move_speed_people_y){
-    sprite_list_all[g].setVelocity(move_speed_people_x,move_speed_people_y);
-}
+
 
 function role_step2(g) {
     if (sprite_list_all[g].role == 'People'){
@@ -330,7 +345,7 @@ function setup() {
 
     pause_continute_button = createImg(pause_continue_button_path);
     pause_continute_button.position(420, 280); 
-    pause_continute_button.mousePressed(() => pause_frames = false);
+    pause_continute_button.mousePressed(() => record_pause());
     pause_continute_button.hide()
 
     pause_restart_button = createImg(pause_restart_button_path);
@@ -361,6 +376,7 @@ function draw() {
         /* 背景 */
 
         /* 按鈕 */
+        frameRate(0);
         pause_list_frame.show();
         pause_continute_button.show();
         pause_exit_button.show();
@@ -426,13 +442,12 @@ function draw() {
         image(timeBoxImage,30,0,320,100);
         image(timeNowImage,time_bar_xPlace,10,time_bar_xSize,85);
 
- 
+
         /* 計時 */
         if (frameCount % 60 == 0 && game1_timer > 0){
             game1_timer--;
             game1_special_role_show_timer--;
         }
-
 
 
         /* 畫面切換 */
@@ -486,7 +501,7 @@ function draw() {
         }
 
         image(timeBoxImage,30,0,320,100);
-        if (game2_timer > 1) {
+        if (game2_timer >0) {
             image(timeNowImage,time_bar_xPlace,10,time_bar_xSize,85);
         }
 
@@ -528,7 +543,7 @@ function draw() {
         if (result_wait_counter > 3) {
             if (mession_result){
                 background(result_success_frame);
-                fill('#feefd9');
+                fill('#bf360c');
             } else {
                 background(result_failed_frame);
                 fill('#2850ab');
