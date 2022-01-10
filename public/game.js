@@ -137,6 +137,7 @@ function click_detect() {
                 if (sprite_list_all[q].role == "Soldier"){soldier_count += 1}
                 if (sprite_list_all[q].role == "Greencard"){greencard_count += 1}
 
+                break
 
                 /* 不平等加分 */
                 // if (sprite_list_all[q].role == "People"){
@@ -234,7 +235,8 @@ function role_step2(g) {
     }
     if (sprite_list_all[g].position.x > 10 && sprite_list_all[g].position.x <900){
         if(sprite_list_all[g].position.y >300){
-            run_way(g,(300-sprite_list_all[g].position.x)/200  ,(Math.random()*100%5-people_run_speed_base)/5);                
+            // run_way(g,(300-sprite_list_all[g].position.x)/200  ,(Math.random()*100%5-people_run_speed_base)/5);
+            run_way(g,(200-sprite_list_all[g].position.x)/100  ,(Math.random()*100%5-people_run_speed_base)/5);           
         }
         else{
             run_way(g,0,0,0,0);
