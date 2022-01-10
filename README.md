@@ -1,7 +1,7 @@
 # Refugee Ark
 game made by p5js
 
-# 遊戲貢獻者
+# Contributors
 |組員|系級|學號|工作分配|github|
 |-|-|-|-|-|
 |陳湘宜|廣告四|106405176| 人物設計、PPT | 
