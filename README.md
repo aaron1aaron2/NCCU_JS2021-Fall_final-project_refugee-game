@@ -1,6 +1,16 @@
 # Refugee Ark
 game made by p5js
 
+# DEMO
+
+<div align="center">
+   <a href="https://www.youtube.com/watch?v=Nqbug47p0Ho">
+     <img src="https://img.youtube.com/vi/Nqbug47p0Ho/0.jpg" 
+      alt="Everything Is AWESOME" 
+      style="width:100%;">
+   </a>
+</div>
+    
 # Contributors
 |組員|系級|學號|工作分配|github|
 |-|-|-|-|-|
