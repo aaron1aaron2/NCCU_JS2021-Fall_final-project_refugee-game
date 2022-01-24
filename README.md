@@ -1,7 +1,7 @@
 # Refugee Ark
 game made by p5js
 
-# Design & Current affair
+# Design
 <div align="center">
    <a href="https://youtu.be/BahdQd2NUcU">
      <img src="https://img.youtube.com/vi/BahdQd2NUcU/maxresdefault.jpg" 
