@@ -1,6 +1,8 @@
 # Refugee Ark
 game made by p5js
 
+<!-- 拿碗豆 -->
+
 # Design
 <div align="center">
    <a href="https://youtu.be/BahdQd2NUcU">
